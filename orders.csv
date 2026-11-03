@@ -1,0 +1,61 @@
+﻿Order ID,Customer Name,Contact Number,Product,Order Date,Shipping Address,Status
+ORD-2026-1001,Ali Khan,+92 312458591,USB Flash Drive 64GB,2026-07-29,"House 36, Street 190, Gulshan-e-Iqbal, Karachi, Pakistan",Delivered
+ORD-2026-1002,Ayesha Malik,+92 391445199,USB-C Hub,2026-07-28,"House 4, Street 9, Satellite Town, Gujranwala, Pakistan",Delivered
+ORD-2026-1003,Ahmed Raza,+92 395667265,Wireless Router,2026-08-23,"House 84, Street 184, Cantt, Sialkot, Pakistan",Delivered
+ORD-2026-1004,Fatima Noor,+92 352714803,Laptop Stand,2026-08-05,"House 55, Street 179, Model Town, Lahore, Pakistan",Delivered
+ORD-2026-1005,Usman Tariq,+92 308707870,Power Bank 20000mAh,2026-09-16,"House 46, Street 25, PECHS, Karachi, Pakistan",Delivered
+ORD-2026-1006,Hira Shah,+92 397067228,USB-C Hub,2026-09-09,"House 49, Street 250, Cantt, Sialkot, Pakistan",Delivered
+ORD-2026-1007,Bilal Ahmed,+92 342338687,Wireless Mouse,2026-09-23,"House 9, Street 181, DC Colony, Gujranwala, Pakistan",Delivered
+ORD-2026-1008,Zainab Iqbal,+92 327210606,Bluetooth Speaker,2026-09-20,"House 36, Street 98, Satellite Town, Rawalpindi, Pakistan",Pending
+ORD-2026-1009,Hamza Siddiqui,+92 385107245,USB-C Hub,2026-09-16,"House 35, Street 172, Shah Rukn-e-Alam, Multan, Pakistan",Processing
+ORD-2026-1010,Maham Aslam,+92 304842788,Wireless Router,2026-07-29,"House 35, Street 98, Bahria Town, Islamabad, Pakistan",Processing
+ORD-2026-1011,Hassan Ali,+92 396279418,USB-C Hub,2026-07-28,"House 35, Street 103, DHA Phase 5, Lahore, Pakistan",On Hold
+ORD-2026-1012,Sana Javed,+92 335408072,Bluetooth Speaker,2026-07-19,"House 83, Street 102, Chaklala Scheme 3, Rawalpindi, Pakistan",Delivered
+ORD-2026-1013,Omar Farooq,+92 329548432,HDMI Cable 2m,2026-08-16,"House 75, Street 230, Satellite Town, Gujranwala, Pakistan",Delivered
+ORD-2026-1014,Maryam Khalid,+92 362065818,Bluetooth Headphones,2026-07-20,"House 7, Street 194, Jinnah Town, Quetta, Pakistan",Processing
+ORD-2026-1015,Danish Hussain,+92 302921859,Ethernet Adapter,2026-08-02,"House 60, Street 153, University Town, Peshawar, Pakistan",Cancelled
+ORD-2026-1016,Iqra Ahmed,+92 328612220,Laptop Stand,2026-07-15,"House 83, Street 197, Model Town, Sialkot, Pakistan",Delivered
+ORD-2026-1017,Saad Qureshi,+92 349517169,1080p Webcam,2026-09-03,"House 65, Street 249, DHA Phase 5, Lahore, Pakistan",On Hold
+ORD-2026-1018,Amna Sheikh,+92 381009594,1080p Webcam,2026-09-08,"House 48, Street 40, DC Colony, Gujranwala, Pakistan",Cancelled
+ORD-2026-1019,Taha Mahmood,+92 345017343,Bluetooth Headphones,2026-10-27,"House 3, Street 126, Satellite Town, Gujranwala, Pakistan",Shipped
+ORD-2026-1020,Laiba Rauf,+92 319937326,USB-C Hub,2026-07-11,"House 73, Street 225, Model Town, Lahore, Pakistan",Pending
+ORD-2026-1021,Fahad Malik,+92 398099076,Wireless Router,2026-07-22,"House 61, Street 169, F-10/3, Islamabad, Pakistan",Delivered
+ORD-2026-1022,Anaya Khan,+92 379683481,HDMI Cable 2m,2026-09-24,"House 40, Street 183, Bahria Town Phase 4, Rawalpindi, Pakistan",Processing
+ORD-2026-1023,Abdullah Saeed,+92 384860684,USB-C Hub,2026-08-13,"House 29, Street 64, Jinnah Town, Quetta, Pakistan",Delivered
+ORD-2026-1024,Eman Riaz,+92 306543670,Wireless Mouse,2026-07-30,"House 10, Street 2, DC Colony, Gujranwala, Pakistan",Delivered
+ORD-2026-1025,Rayan Akhtar,+92 398930103,Noise-Cancelling Headphones,2026-07-28,"House 36, Street 61, Clifton, Karachi, Pakistan",Processing
+ORD-2026-1026,Mehwish Bibi,+92 366944126,Portable SSD 1TB,2026-07-13,"House 53, Street 207, Chaklala Scheme 3, Rawalpindi, Pakistan",Delivered
+ORD-2026-1027,Adeel Butt,+92 312016911,Wireless Mouse,2026-09-25,"House 94, Street 120, University Town, Peshawar, Pakistan",Processing
+ORD-2026-1028,Noor Fatima,+92 373351868,USB Flash Drive 64GB,2026-07-25,"House 14, Street 87, Dabgari Gardens, Peshawar, Pakistan",Delivered
+ORD-2026-1029,Shahzaib Khan,+92 372642635,USB Flash Drive 64GB,2026-10-20,"House 60, Street 72, Hayatabad Phase 3, Peshawar, Pakistan",Cancelled
+ORD-2026-1030,Khadija Noor,+92 333790237,USB-C Hub,2026-10-27,"House 2, Street 215, Wapda Town, Lahore, Pakistan",Pending
+ORD-2026-1031,Ali Khan,+92 361036161,HDMI Cable 2m,2026-10-24,"House 28, Street 124, University Town, Peshawar, Pakistan",Delivered
+ORD-2026-1032,Ayesha Malik,+92 389164991,Gaming Mouse,2026-08-24,"House 59, Street 238, University Town, Peshawar, Pakistan",Processing
+ORD-2026-1033,Ahmed Raza,+92 306261415,Wireless Mouse,2026-09-13,"House 28, Street 76, F-10/3, Islamabad, Pakistan",Pending
+ORD-2026-1034,Fatima Noor,+92 321954280,Ethernet Adapter,2026-10-26,"House 62, Street 150, Johar Town, Lahore, Pakistan",On Hold
+ORD-2026-1035,Usman Tariq,+92 337774229,USB-C Hub,2026-09-15,"House 24, Street 218, Cantt, Sialkot, Pakistan",Delivered
+ORD-2026-1036,Hira Shah,+92 369770838,Laptop Backpack,2026-07-06,"House 75, Street 64, Clifton, Karachi, Pakistan",Processing
+ORD-2026-1037,Bilal Ahmed,+92 326033115,Laptop Stand,2026-07-31,"House 86, Street 53, Gulgasht Colony, Multan, Pakistan",Delivered
+ORD-2026-1038,Zainab Iqbal,+92 392677407,USB-C Hub,2026-07-02,"House 97, Street 238, Satellite Town, Quetta, Pakistan",Shipped
+ORD-2026-1039,Hamza Siddiqui,+92 315098412,Mechanical Gaming Keyboard,2026-07-17,"House 65, Street 55, Clifton, Karachi, Pakistan",Cancelled
+ORD-2026-1040,Maham Aslam,+92 381131249,Wireless Router,2026-09-29,"House 57, Street 41, Gulgasht Colony, Multan, Pakistan",Shipped
+ORD-2026-1041,Hassan Ali,+92 342936571,Bluetooth Headphones,2026-10-29,"House 85, Street 239, Model Town, Sialkot, Pakistan",On Hold
+ORD-2026-1042,Sana Javed,+92 354415796,Gaming Mouse,2026-09-16,"House 35, Street 40, Clifton, Karachi, Pakistan",Delivered
+ORD-2026-1043,Omar Farooq,+92 341739653,USB-C Hub,2026-09-20,"House 7, Street 65, Susan Road, Faisalabad, Pakistan",Shipped
+ORD-2026-1044,Maryam Khalid,+92 388175395,Mechanical Gaming Keyboard,2026-07-21,"House 17, Street 198, DHA Phase 5, Lahore, Pakistan",Pending
+ORD-2026-1045,Danish Hussain,+92 353484601,Laptop Cooling Pad,2026-09-08,"House 10, Street 29, Cantt, Sialkot, Pakistan",Delivered
+ORD-2026-1046,Iqra Ahmed,+92 307003042,Power Bank 20000mAh,2026-10-24,"House 40, Street 11, Hayatabad Phase 3, Peshawar, Pakistan",Cancelled
+ORD-2026-1047,Saad Qureshi,+92 363592974,Power Bank 20000mAh,2026-10-08,"House 14, Street 171, Bahria Town Phase 4, Rawalpindi, Pakistan",Processing
+ORD-2026-1048,Amna Sheikh,+92 357907400,USB-C Fast Charger,2026-07-04,"House 23, Street 250, Bahria Town Phase 4, Rawalpindi, Pakistan",Delivered
+ORD-2026-1049,Taha Mahmood,+92 374731818,Bluetooth Headphones,2026-08-18,"House 90, Street 41, Saddar, Rawalpindi, Pakistan",On Hold
+ORD-2026-1050,Laiba Rauf,+92 337685149,USB Flash Drive 64GB,2026-07-29,"House 40, Street 90, Chaklala Scheme 3, Rawalpindi, Pakistan",Delivered
+ORD-2026-1051,Fahad Malik,+92 369996207,Mechanical Gaming Keyboard,2026-08-14,"House 9, Street 222, Gulgasht Colony, Multan, Pakistan",Processing
+ORD-2026-1052,Anaya Khan,+92 341641849,1080p Webcam,2026-09-13,"House 34, Street 30, Bosan Road, Multan, Pakistan",Cancelled
+ORD-2026-1053,Abdullah Saeed,+92 382940214,Laptop Stand,2026-08-25,"House 45, Street 112, Clifton, Karachi, Pakistan",Processing
+ORD-2026-1054,Eman Riaz,+92 384305700,Wireless Mouse,2026-09-29,"House 33, Street 49, Dabgari Gardens, Peshawar, Pakistan",Shipped
+ORD-2026-1055,Rayan Akhtar,+92 316038571,Laptop Stand,2026-09-18,"House 86, Street 18, Cantt, Multan, Pakistan",Shipped
+ORD-2026-1056,Mehwish Bibi,+92 383135534,Laptop Stand,2026-08-21,"House 53, Street 171, Model Town, Sialkot, Pakistan",Processing
+ORD-2026-1057,Adeel Butt,+92 361006810,1080p Webcam,2026-09-17,"House 49, Street 171, Chaklala Scheme 3, Rawalpindi, Pakistan",Processing
+ORD-2026-1058,Noor Fatima,+92 378411939,Monitor Light Bar,2026-09-16,"House 56, Street 54, Madina Town, Faisalabad, Pakistan",Processing
+ORD-2026-1059,Shahzaib Khan,+92 322422633,Noise-Cancelling Headphones,2026-10-10,"House 66, Street 55, Samungli Road, Quetta, Pakistan",On Hold
+ORD-2026-1060,Khadija Noor,+92 333472189,USB Flash Drive 64GB,2026-09-25,"House 97, Street 24, Madina Town, Faisalabad, Pakistan",Shipped

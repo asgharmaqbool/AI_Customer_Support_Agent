@@ -9,9 +9,9 @@ import streamlit as st
 from groq import Groq
 
 
-# ==========================================
+# =====================================================
 # 1. APP CONFIGURATION
-# ==========================================
+# =====================================================
 
 st.set_page_config(
     page_title="SmartSupport AI",
@@ -23,7 +23,7 @@ MODEL = "openai/gpt-oss-120b"
 
 st.markdown("""
 <style>
-.main {
+.stApp {
     background-color: #f5f8ff;
 }
 h1, h2, h3 {
@@ -34,6 +34,7 @@ h1, h2, h3 {
     color: white;
     border-radius: 10px;
     font-weight: bold;
+    padding: 8px 20px;
 }
 [data-testid="stSidebar"] {
     background-color: #eaf1ff;
@@ -42,13 +43,16 @@ h1, h2, h3 {
 """, unsafe_allow_html=True)
 
 
-# ==========================================
-# 2. LOAD GROQ API KEY
-# ==========================================
+# =====================================================
+# 2. GROQ API KEY
+# =====================================================
 
 def get_api_key():
     try:
-        return st.secrets.get("GROQ_API_KEY", os.getenv("GROQ_API_KEY", ""))
+        return st.secrets.get(
+            "GROQ_API_KEY",
+            os.getenv("GROQ_API_KEY", "")
+        )
     except Exception:
         return os.getenv("GROQ_API_KEY", "")
 
@@ -58,19 +62,41 @@ api_key = get_api_key()
 client = Groq(api_key=api_key) if api_key else None
 
 
-# ==========================================
-# 3. CSV DATABASE FILES
-# ==========================================
+# =====================================================
+# 3. CSV DATABASE LOADING
+# =====================================================
 
-def load_data(filename, columns):
-    if os.path.exists(filename):
-        try:
-            return pd.read_csv(filename, dtype=str).fillna("")
-        except Exception:
-            st.error(f"Unable to read {filename}. Please check the CSV file.")
-            return pd.DataFrame(columns=columns)
+def load_data(filename, default_columns):
 
-    return pd.DataFrame(columns=columns)
+    if not os.path.exists(filename):
+        return pd.DataFrame(columns=default_columns)
+
+    try:
+        df = pd.read_csv(
+            filename,
+            dtype=str,
+            encoding="utf-8-sig"
+        )
+
+        # Clean column headings
+        df.columns = (
+            df.columns.astype(str)
+            .str.strip()
+            .str.lower()
+            .str.replace(" ", "_", regex=False)
+        )
+
+        # Clean data
+        df = df.fillna("")
+
+        for column in df.columns:
+            df[column] = df[column].astype(str).str.strip()
+
+        return df
+
+    except Exception as error:
+        st.error(f"Error loading {filename}: {error}")
+        return pd.DataFrame(columns=default_columns)
 
 
 customers = load_data(
@@ -80,8 +106,7 @@ customers = load_data(
 
 orders = load_data(
     "orders.csv",
-    ["order_id", "customer_id", "product", "order_date",
-     "status", "amount", "tracking_number"]
+    ["order_id", "customer_name", "phone", "product", "order_date"]
 )
 
 tickets = load_data(
@@ -96,32 +121,31 @@ knowledge = load_data(
 )
 
 
-# ==========================================
-# 4. ORDER ID MATCHING - FIXED
-# ==========================================
+# =====================================================
+# 4. ORDER ID NORMALIZATION
+# =====================================================
 
 def normalize_order_id(order_id):
-    """
-    Removes spaces and hyphens so different formats
-    can match the same order ID.
-    Example:
-    ORD-2026-1002 = ORD20261002
-    """
 
-    return re.sub(r"[^A-Z0-9]", "", str(order_id).upper())
+    return re.sub(
+        r"[^A-Z0-9]",
+        "",
+        str(order_id).strip().upper()
+    )
 
+
+# =====================================================
+# 5. EXTRACT ORDER ID FROM MESSAGE
+# =====================================================
 
 def extract_order_id(message):
-    """
-    Recognizes IDs such as:
-    ORD-2026-1002
-    ORD20261002
-    ORD-1002
-    """
 
     pattern = r"\bORD(?:[-\s]?\d{4})?[-\s]?\d{3,}\b"
 
-    match = re.search(pattern, str(message).upper())
+    match = re.search(
+        pattern,
+        str(message).upper()
+    )
 
     if match:
         return match.group(0).strip()
@@ -129,18 +153,41 @@ def extract_order_id(message):
     return None
 
 
-def search_order(order_id):
-    """
-    Searches the orders.csv database using a normalized ID.
-    """
+# =====================================================
+# 6. SEARCH ORDER DATABASE - FIXED
+# =====================================================
 
-    if orders.empty or "order_id" not in orders.columns:
+def search_order(order_id):
+
+    if orders.empty:
+        return None
+
+    possible_columns = [
+        "order_id",
+        "orderid",
+        "order_number",
+        "order_no"
+    ]
+
+    order_column = next(
+        (
+            column
+            for column in possible_columns
+            if column in orders.columns
+        ),
+        None
+    )
+
+    if order_column is None:
         return None
 
     searched_id = normalize_order_id(order_id)
 
     for _, order in orders.iterrows():
-        database_id = normalize_order_id(order.get("order_id", ""))
+
+        database_id = normalize_order_id(
+            order.get(order_column, "")
+        )
 
         if database_id == searched_id:
             return order.to_dict()
@@ -148,12 +195,51 @@ def search_order(order_id):
     return None
 
 
-# ==========================================
-# 5. CUSTOMER LOOKUP
-# ==========================================
+# =====================================================
+# 7. FORMAT ORDER DETAILS
+# =====================================================
+
+def format_order_response(order):
+
+    response = "### 📦 Your Order Details\n\n"
+
+    fields = {
+        "order_id": "Order ID",
+        "customer_name": "Customer Name",
+        "phone": "Phone Number",
+        "product": "Product",
+        "order_date": "Order Date",
+        "status": "Order Status",
+        "amount": "Order Amount",
+        "tracking_number": "Tracking Number",
+        "expected_delivery": "Expected Delivery"
+    }
+
+    for key, label in fields.items():
+
+        value = order.get(key, "")
+
+        if value and str(value).strip():
+            response += f"**{label}:** {value}\n\n"
+
+    if not any(order.get(key, "") for key in fields):
+        response += "Order found, but no details are available."
+
+    response += "\nHow else can I help you today?"
+
+    return response
+
+
+# =====================================================
+# 8. CUSTOMER LOOKUP
+# =====================================================
 
 def find_customer(customer_id):
-    if customers.empty or "customer_id" not in customers.columns:
+
+    if customers.empty:
+        return None
+
+    if "customer_id" not in customers.columns:
         return None
 
     result = customers[
@@ -167,46 +253,12 @@ def find_customer(customer_id):
     return None
 
 
-# ==========================================
-# 6. ORDER RESPONSE
-# ==========================================
-
-def format_order_response(order):
-    """
-    Shows basic order information.
-    Does not reveal private contact details.
-    """
-
-    response = "### 📦 Your Order Details\n\n"
-
-    display_fields = {
-        "order_id": "Order ID",
-        "product": "Product",
-        "order_date": "Order Date",
-        "status": "Order Status",
-        "amount": "Order Amount",
-        "tracking_number": "Tracking Number",
-        "expected_delivery": "Expected Delivery"
-    }
-
-    for field, label in display_fields.items():
-        value = order.get(field, "")
-
-        if value and str(value).strip():
-            response += f"**{label}:** {value}\n\n"
-
-    response += (
-        "Is there anything else I can help you with?"
-    )
-
-    return response
-
-
-# ==========================================
-# 7. KNOWLEDGE BASE SEARCH
-# ==========================================
+# =====================================================
+# 9. KNOWLEDGE BASE
+# =====================================================
 
 def search_knowledge(question):
+
     if knowledge.empty:
         return ""
 
@@ -216,8 +268,14 @@ def search_knowledge(question):
         return ""
 
     for _, row in knowledge.iterrows():
-        stored_question = str(row.get("question", "")).lower()
-        answer = str(row.get("answer", ""))
+
+        stored_question = str(
+            row.get("question", "")
+        ).lower()
+
+        answer = str(
+            row.get("answer", "")
+        )
 
         if stored_question and (
             stored_question in question
@@ -228,9 +286,9 @@ def search_knowledge(question):
     return ""
 
 
-# ==========================================
-# 8. CREATE SUPPORT TICKET
-# ==========================================
+# =====================================================
+# 10. CREATE SUPPORT TICKET
+# =====================================================
 
 def create_ticket(customer_id, subject, message):
 
@@ -242,11 +300,16 @@ def create_ticket(customer_id, subject, message):
         "subject": subject,
         "message": message,
         "status": "Open",
-        "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        "created_at": datetime.now().strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
     }
 
     tickets = pd.concat(
-        [tickets, pd.DataFrame([new_ticket])],
+        [
+            tickets,
+            pd.DataFrame([new_ticket])
+        ],
         ignore_index=True
     )
 
@@ -255,16 +318,16 @@ def create_ticket(customer_id, subject, message):
     return new_ticket["ticket_id"]
 
 
-# ==========================================
-# 9. GROQ AI RESPONSE
-# ==========================================
+# =====================================================
+# 11. GROQ AI RESPONSE
+# =====================================================
 
 def get_ai_response(user_message):
 
     if client is None:
         return (
             "⚠️ Groq API key is missing. "
-            "Please configure GROQ_API_KEY in Streamlit Secrets."
+            "Please add GROQ_API_KEY in Streamlit Secrets."
         )
 
     policy_context = ""
@@ -273,17 +336,17 @@ def get_ai_response(user_message):
         policy_context = knowledge.to_string(index=False)
 
     prompt = f"""
-You are SmartSupport AI, a professional customer support assistant.
+You are SmartSupport AI, a friendly customer support assistant.
 
 Your responsibilities:
-1. Help customers with their questions.
-2. Explain return and refund policies.
-3. Explain delivery and shipping policies.
-4. Help customers with complaints.
-5. Use simple, friendly English.
-6. Never invent order details.
-7. Never claim an order has been found unless the database confirms it.
-8. Never reveal another customer's personal information.
+- Answer customer questions.
+- Explain return and refund policies.
+- Explain delivery and shipping policies.
+- Help customers with complaints.
+- Use simple and professional English.
+- Never invent order details.
+- Never claim an order has been checked unless the database confirms it.
+- Never reveal private information belonging to other customers.
 
 Company Knowledge Base:
 {policy_context}
@@ -291,18 +354,19 @@ Company Knowledge Base:
 Customer Message:
 {user_message}
 
-Give a helpful and concise response.
-If the customer wants order tracking but has not provided an order ID,
-ask them to provide their Order ID.
+Provide a helpful and concise answer.
 """
 
     try:
+
         completion = client.chat.completions.create(
             model=MODEL,
             messages=[
                 {
                     "role": "system",
-                    "content": "You are SmartSupport AI Customer Support Assistant."
+                    "content": (
+                        "You are SmartSupport AI Customer Support Assistant."
+                    )
                 },
                 {
                     "role": "user",
@@ -315,13 +379,14 @@ ask them to provide their Order ID.
 
         return completion.choices[0].message.content
 
-    except Exception as e:
-        return f"Sorry, AI service error: {str(e)}"
+    except Exception as error:
+
+        return f"Sorry, AI service error: {str(error)}"
 
 
-# ==========================================
-# 10. CHATBOT RESPONSE LOGIC
-# ==========================================
+# =====================================================
+# 12. CHATBOT RESPONSE
+# =====================================================
 
 def chatbot_response(user_message):
 
@@ -330,8 +395,7 @@ def chatbot_response(user_message):
     if not user_message:
         return "Please enter your message."
 
-    # IMPORTANT: Check order IDs BEFORE calling Groq AI.
-
+    # First check order database
     order_id = extract_order_id(user_message)
 
     if order_id:
@@ -342,51 +406,47 @@ def chatbot_response(user_message):
             return format_order_response(order)
 
         return (
-            f"⚠️ I could not find order **{order_id}** "
-            "in our order database.\n\n"
-            "Please check that you entered the correct Order ID. "
-            "You can also contact our support team for assistance."
+            f"⚠️ Order **{order_id}** was not found in our database.\n\n"
+            "Please check your Order ID and try again."
         )
 
-    # Check knowledge base
+    # Check company policies
     policy_answer = search_knowledge(user_message)
 
     if policy_answer:
         return policy_answer
 
-    # If no order ID or policy answer, use AI
+    # Otherwise use Groq AI
     return get_ai_response(user_message)
 
 
-# ==========================================
-# 11. SESSION STATE
-# ==========================================
+# =====================================================
+# 13. SESSION STATE
+# =====================================================
 
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
 
-# ==========================================
-# 12. HEADER
-# ==========================================
+# =====================================================
+# 14. HEADER
+# =====================================================
 
 st.title("🤖 SmartSupport AI")
 
-st.markdown(
-    """
-    ### Your Intelligent Customer Support Assistant
+st.markdown("""
+### Your Intelligent Customer Support Assistant
 
-    Get instant answers, track your orders, and receive
-    support with our AI-powered customer service system.
-    """
-)
+Get instant answers, track your orders, and receive
+customer support through our AI-powered assistant.
+""")
 
 st.divider()
 
 
-# ==========================================
-# 13. SIDEBAR NAVIGATION
-# ==========================================
+# =====================================================
+# 15. SIDEBAR
+# =====================================================
 
 st.sidebar.title("⚙️ SmartSupport Menu")
 
@@ -402,17 +462,17 @@ page = st.sidebar.radio(
 )
 
 
-# ==========================================
-# 14. CUSTOMER CHAT
-# ==========================================
+# =====================================================
+# 16. CUSTOMER CHAT
+# =====================================================
 
 if page == "AI Customer Chat":
 
     st.subheader("💬 Chat with SmartSupport AI")
 
     st.info(
-        "You can ask questions, check an order, "
-        "or learn about our refund and return policies."
+        "Ask questions, track orders, or learn about "
+        "our return and refund policies."
     )
 
     for message in st.session_state.chat_history:
@@ -421,7 +481,7 @@ if page == "AI Customer Chat":
             st.markdown(message["content"])
 
     user_message = st.chat_input(
-        "Example: Please check my order ORD-2026-1002"
+        "Example: Check my order ORD-2026-1001"
     )
 
     if user_message:
@@ -438,7 +498,7 @@ if page == "AI Customer Chat":
 
         with st.chat_message("assistant"):
 
-            with st.spinner("SmartSupport AI is checking..."):
+            with st.spinner("Checking your request..."):
 
                 answer = chatbot_response(user_message)
 
@@ -452,13 +512,14 @@ if page == "AI Customer Chat":
         )
 
     if st.button("🗑️ Clear Chat"):
+
         st.session_state.chat_history = []
         st.rerun()
 
 
-# ==========================================
-# 15. ADMIN DASHBOARD
-# ==========================================
+# =====================================================
+# 17. ADMIN DASHBOARD
+# =====================================================
 
 elif page == "Admin Dashboard":
 
@@ -466,9 +527,20 @@ elif page == "Admin Dashboard":
 
     col1, col2, col3 = st.columns(3)
 
-    col1.metric("Total Customers", len(customers))
-    col2.metric("Total Orders", len(orders))
-    col3.metric("Support Tickets", len(tickets))
+    col1.metric(
+        "Total Customers",
+        len(customers)
+    )
+
+    col2.metric(
+        "Total Orders",
+        len(orders)
+    )
+
+    col3.metric(
+        "Support Tickets",
+        len(tickets)
+    )
 
     st.divider()
 
@@ -476,31 +548,33 @@ elif page == "Admin Dashboard":
 
         st.markdown("### 📦 Order Status Overview")
 
-        status_counts = orders["status"].value_counts()
-
-        st.bar_chart(status_counts)
+        st.bar_chart(
+            orders["status"].value_counts()
+        )
 
     if not tickets.empty and "status" in tickets.columns:
 
         st.markdown("### 🎫 Ticket Status Overview")
 
-        ticket_counts = tickets["status"].value_counts()
+        st.bar_chart(
+            tickets["status"].value_counts()
+        )
 
-        st.bar_chart(ticket_counts)
 
-
-# ==========================================
-# 16. CUSTOMERS
-# ==========================================
+# =====================================================
+# 18. CUSTOMER DATABASE
+# =====================================================
 
 elif page == "Customers":
 
     st.subheader("👥 Customer Database")
 
     if customers.empty:
+
         st.warning("No customer records found.")
 
     else:
+
         st.dataframe(
             customers,
             use_container_width=True,
@@ -515,16 +589,17 @@ elif page == "Customers":
         )
 
 
-# ==========================================
-# 17. ORDERS
-# ==========================================
+# =====================================================
+# 19. ORDER MANAGEMENT
+# =====================================================
 
 elif page == "Orders":
 
     st.subheader("📦 Order Management")
 
     if orders.empty:
-        st.warning("No orders found in orders.csv.")
+
+        st.warning("No orders found.")
 
     else:
 
@@ -541,31 +616,46 @@ elif page == "Orders":
             mime="text/csv"
         )
 
-        st.divider()
+    st.divider()
 
-        st.markdown("### 🔍 Test Order Search")
+    st.markdown("### 🔍 Test Order Search")
 
-        test_order_id = st.text_input(
-            "Enter Order ID",
-            placeholder="ORD-2026-1002"
-        )
+    test_order_id = st.text_input(
+        "Enter Order ID",
+        placeholder="ORD-2026-1001"
+    )
 
-        if st.button("Search Order"):
+    if st.button("Search Order"):
 
-            found_order = search_order(test_order_id)
+        found_order = search_order(test_order_id)
 
-            if found_order:
-                st.success("Order found successfully!")
+        if found_order:
 
-                st.json(found_order)
+            st.success("Order found successfully!")
 
-            else:
-                st.error("Order ID not found. Please check your CSV database.")
+            st.json(found_order)
+
+        else:
+
+            st.error(
+                "Order not found. Please check your CSV database."
+            )
+
+    # Temporary diagnostic to verify CSV structure
+    with st.expander("Database Diagnostic"):
+
+        st.write("Total orders:", len(orders))
+
+        st.write("CSV column headings:", list(orders.columns))
+
+        if "order_id" in orders.columns:
+            st.write("Available Order IDs:")
+            st.write(orders["order_id"].tolist())
 
 
-# ==========================================
-# 18. SUPPORT TICKETS
-# ==========================================
+# =====================================================
+# 20. SUPPORT TICKETS
+# =====================================================
 
 elif page == "Support Tickets":
 
@@ -580,7 +670,7 @@ elif page == "Support Tickets":
 
         subject = st.text_input(
             "Ticket Subject",
-            placeholder="Delivery issue"
+            placeholder="Delivery Issue"
         )
 
         message = st.text_area(
@@ -594,7 +684,10 @@ elif page == "Support Tickets":
         if submit_ticket:
 
             if not subject or not message:
-                st.error("Please enter both subject and message.")
+
+                st.error(
+                    "Please enter the subject and message."
+                )
 
             else:
 
@@ -605,7 +698,7 @@ elif page == "Support Tickets":
                 )
 
                 st.success(
-                    f"Ticket created successfully! Ticket ID: {ticket_id}"
+                    f"Ticket created! Your Ticket ID is {ticket_id}"
                 )
 
     st.divider()
@@ -613,6 +706,7 @@ elif page == "Support Tickets":
     st.markdown("### Existing Support Tickets")
 
     if tickets.empty:
+
         st.info("No support tickets available.")
 
     else:
@@ -631,9 +725,9 @@ elif page == "Support Tickets":
         )
 
 
-# ==========================================
-# 19. FOOTER
-# ==========================================
+# =====================================================
+# 21. FOOTER
+# =====================================================
 
 st.divider()
 

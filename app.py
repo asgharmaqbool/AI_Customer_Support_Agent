@@ -16,35 +16,225 @@ from groq import Groq
 st.set_page_config(
     page_title="SmartSupport AI",
     page_icon="🤖",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="auto"
 )
 
 MODEL = "openai/gpt-oss-120b"
 
+
+# =====================================================
+# 2. RESPONSIVE CSS - DESKTOP + ANDROID
+# =====================================================
+
 st.markdown("""
 <style>
+
+/* ---------- MAIN APPLICATION ---------- */
+
 .stApp {
-    background-color: #f5f8ff;
+    background: #f3f6fc !important;
+    color: #172554 !important;
 }
-h1, h2, h3 {
-    color: #174ea6;
+
+[data-testid="stAppViewContainer"] {
+    background: #f3f6fc !important;
 }
-.stButton button {
-    background-color: #1769e0;
-    color: white;
-    border-radius: 10px;
-    font-weight: bold;
-    padding: 8px 20px;
+
+[data-testid="stMain"] {
+    background: #f3f6fc !important;
 }
+
+[data-testid="stHeader"] {
+    background: #f3f6fc !important;
+}
+
+[data-testid="stMainBlockContainer"] {
+    padding-top: 2rem;
+    padding-bottom: 5rem;
+}
+
+/* ---------- HEADINGS ---------- */
+
+h1, h2, h3, h4 {
+    color: #174ea6 !important;
+    font-weight: 800 !important;
+}
+
+p, li, label, .stMarkdown {
+    color: #243b63;
+}
+
+/* ---------- CHAT MESSAGE CARDS ---------- */
+
+div[data-testid="stChatMessage"] {
+    background: #ffffff !important;
+    border: 1px solid #d8e3f5 !important;
+    border-radius: 16px !important;
+    padding: 14px !important;
+    margin-bottom: 12px !important;
+    box-shadow: 0 3px 12px rgba(23, 78, 166, 0.07);
+}
+
+/* FORCE DARK TEXT INSIDE ALL CHAT MESSAGES */
+
+div[data-testid="stChatMessage"] p,
+div[data-testid="stChatMessage"] span,
+div[data-testid="stChatMessage"] li,
+div[data-testid="stChatMessage"] strong,
+div[data-testid="stChatMessage"] em,
+div[data-testid="stChatMessage"] .stMarkdown,
+div[data-testid="stChatMessage"] [data-testid="stMarkdownContainer"] {
+    color: #172554 !important;
+}
+
+/* Chat headings */
+
+div[data-testid="stChatMessage"] h1,
+div[data-testid="stChatMessage"] h2,
+div[data-testid="stChatMessage"] h3,
+div[data-testid="stChatMessage"] h4 {
+    color: #174ea6 !important;
+}
+
+/* ---------- CHAT INPUT ---------- */
+
+div[data-testid="stChatInput"] {
+    background: #ffffff !important;
+    border: 2px solid #b7cef5 !important;
+    border-radius: 15px !important;
+}
+
+div[data-testid="stChatInput"] textarea {
+    color: #172554 !important;
+    background: #ffffff !important;
+    font-size: 16px !important;
+}
+
+div[data-testid="stChatInput"] textarea::placeholder {
+    color: #64748b !important;
+    opacity: 1 !important;
+}
+
+/* ---------- BUTTONS ---------- */
+
+.stButton button,
+.stDownloadButton button,
+.stFormSubmitButton button {
+    background: #1769e0 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 11px !important;
+    font-weight: 700 !important;
+    padding: 9px 18px !important;
+    min-height: 42px !important;
+}
+
+.stButton button p,
+.stDownloadButton button p,
+.stFormSubmitButton button p {
+    color: #ffffff !important;
+}
+
+.stButton button:hover {
+    background: #0d47a1 !important;
+}
+
+/* ---------- SIDEBAR ---------- */
+
 [data-testid="stSidebar"] {
-    background-color: #eaf1ff;
+    background: #eaf1ff !important;
 }
+
+[data-testid="stSidebar"] * {
+    color: #173b75 !important;
+}
+
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2 {
+    color: #174ea6 !important;
+}
+
+/* ---------- INPUT FIELDS ---------- */
+
+.stTextInput input,
+.stTextArea textarea,
+.stNumberInput input {
+    color: #172554 !important;
+    background: #ffffff !important;
+    border: 1px solid #b7cef5 !important;
+    border-radius: 10px !important;
+    font-size: 16px !important;
+}
+
+.stTextInput input::placeholder,
+.stTextArea textarea::placeholder {
+    color: #64748b !important;
+    opacity: 1 !important;
+}
+
+/* ---------- INFO / SUCCESS / WARNING ---------- */
+
+[data-testid="stAlert"] {
+    border-radius: 12px !important;
+}
+
+/* ---------- DATA TABLES ---------- */
+
+[data-testid="stDataFrame"] {
+    border: 1px solid #d8e3f5;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+/* ---------- MOBILE RESPONSIVE DESIGN ---------- */
+
+@media screen and (max-width: 768px) {
+
+    [data-testid="stMainBlockContainer"] {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+        padding-top: 1rem !important;
+    }
+
+    h1 {
+        font-size: 27px !important;
+    }
+
+    h2 {
+        font-size: 22px !important;
+    }
+
+    h3 {
+        font-size: 19px !important;
+    }
+
+    div[data-testid="stChatMessage"] {
+        padding: 11px !important;
+        border-radius: 12px !important;
+        margin-bottom: 10px !important;
+    }
+
+    div[data-testid="stChatInput"] textarea {
+        font-size: 16px !important;
+    }
+
+    .stButton button {
+        width: 100%;
+        min-height: 44px !important;
+    }
+
+    [data-testid="stSidebar"] {
+        min-width: 250px;
+    }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
 
 # =====================================================
-# 2. GROQ API KEY
+# 3. GROQ API KEY
 # =====================================================
 
 def get_api_key():
@@ -63,7 +253,7 @@ client = Groq(api_key=api_key) if api_key else None
 
 
 # =====================================================
-# 3. CSV DATABASE LOADING
+# 4. CSV DATABASE LOADING
 # =====================================================
 
 def load_data(filename, default_columns):
@@ -78,7 +268,6 @@ def load_data(filename, default_columns):
             encoding="utf-8-sig"
         )
 
-        # Clean column headings
         df.columns = (
             df.columns.astype(str)
             .str.strip()
@@ -86,7 +275,6 @@ def load_data(filename, default_columns):
             .str.replace(" ", "_", regex=False)
         )
 
-        # Clean data
         df = df.fillna("")
 
         for column in df.columns:
@@ -122,7 +310,7 @@ knowledge = load_data(
 
 
 # =====================================================
-# 4. ORDER ID NORMALIZATION
+# 5. ORDER ID NORMALIZATION
 # =====================================================
 
 def normalize_order_id(order_id):
@@ -133,10 +321,6 @@ def normalize_order_id(order_id):
         str(order_id).strip().upper()
     )
 
-
-# =====================================================
-# 5. EXTRACT ORDER ID FROM MESSAGE
-# =====================================================
 
 def extract_order_id(message):
 
@@ -154,7 +338,7 @@ def extract_order_id(message):
 
 
 # =====================================================
-# 6. SEARCH ORDER DATABASE - FIXED
+# 6. SEARCH ORDER DATABASE
 # =====================================================
 
 def search_order(order_id):
@@ -377,7 +561,9 @@ Provide a helpful and concise answer.
             max_tokens=1000
         )
 
-        return completion.choices[0].message.content
+        answer = completion.choices[0].message.content
+
+        return answer or "Sorry, I couldn't generate a response. Please try again."
 
     except Exception as error:
 
@@ -395,7 +581,6 @@ def chatbot_response(user_message):
     if not user_message:
         return "Please enter your message."
 
-    # First check order database
     order_id = extract_order_id(user_message)
 
     if order_id:
@@ -410,13 +595,11 @@ def chatbot_response(user_message):
             "Please check your Order ID and try again."
         )
 
-    # Check company policies
     policy_answer = search_knowledge(user_message)
 
     if policy_answer:
         return policy_answer
 
-    # Otherwise use Groq AI
     return get_ai_response(user_message)
 
 
@@ -475,10 +658,14 @@ if page == "AI Customer Chat":
         "our return and refund policies."
     )
 
+    # Display previous conversation
+
     for message in st.session_state.chat_history:
 
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
+
+    # Chat input
 
     user_message = st.chat_input(
         "Example: Check my order ORD-2026-1001"
@@ -527,20 +714,9 @@ elif page == "Admin Dashboard":
 
     col1, col2, col3 = st.columns(3)
 
-    col1.metric(
-        "Total Customers",
-        len(customers)
-    )
-
-    col2.metric(
-        "Total Orders",
-        len(orders)
-    )
-
-    col3.metric(
-        "Support Tickets",
-        len(tickets)
-    )
+    col1.metric("Total Customers", len(customers))
+    col2.metric("Total Orders", len(orders))
+    col3.metric("Support Tickets", len(tickets))
 
     st.divider()
 
@@ -632,7 +808,6 @@ elif page == "Orders":
         if found_order:
 
             st.success("Order found successfully!")
-
             st.json(found_order)
 
         else:
@@ -641,7 +816,6 @@ elif page == "Orders":
                 "Order not found. Please check your CSV database."
             )
 
-    # Temporary diagnostic to verify CSV structure
     with st.expander("Database Diagnostic"):
 
         st.write("Total orders:", len(orders))
@@ -649,6 +823,7 @@ elif page == "Orders":
         st.write("CSV column headings:", list(orders.columns))
 
         if "order_id" in orders.columns:
+
             st.write("Available Order IDs:")
             st.write(orders["order_id"].tolist())
 
@@ -733,8 +908,13 @@ st.divider()
 
 st.markdown(
     """
-    <div style="text-align:center; color:gray;">
-        <b>SmartSupport AI</b><br>
+    <div style="
+        text-align:center;
+        color:#64748b;
+        padding:15px;
+        font-size:14px;
+    ">
+        <b style="color:#174ea6;">SmartSupport AI</b><br>
         Powered by Groq AI + Streamlit<br>
         Intelligent Customer Support System
     </div>
